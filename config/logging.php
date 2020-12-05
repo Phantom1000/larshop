@@ -35,6 +35,11 @@ return [
     */
 
     'channels' => [
+        'ips' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/ips.log')
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],
