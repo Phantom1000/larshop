@@ -33,6 +33,8 @@ class MainController extends Controller
             }
         }
 
+        return 'test';
+
         $products = $query->paginate(6);
         return view('index', compact('products', 'params'));
     }
