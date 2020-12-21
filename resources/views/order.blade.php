@@ -26,10 +26,12 @@
                 </div>
                 <br>
                 <br>
-                <div class="form-inline">
-                    <label for="name" class="col-lg-3 mr-2">Email: </label>
-                    <input type="text" name="email" id="email" value="" class="form-control col-lg-6">
-                </div>
+                @guest
+                    <div class="form-inline">
+                        <label for="name" class="col-lg-3 mr-2">Email: </label>
+                        <input type="text" name="email" id="email" value="" class="form-control col-lg-6">
+                    </div>
+                @endguest
                 <br>
                 @csrf
                 <input type="submit" class="btn btn-success" value="Подтвердите заказ">

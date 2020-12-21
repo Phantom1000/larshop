@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MainController;
 use App\Http\Controllers\ResetController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,9 +33,10 @@ Route::get('reset', App\Http\Controllers\ResetController::class)->name('reset');
 
 Route::get('/', 'App\Http\Controllers\MainController@index')->name('index');
 Route::get('/categories', 'App\Http\Controllers\MainController@categories')->name('categories');
+Route::post('subscription/{product}', [MainController::class, 'subscribe'])->name('subscribe');
 
 Route::get('/category/{category}', 'App\Http\Controllers\MainController@category')->name('category');
-Route::get('/product/{category}/{product?}', 'App\Http\Controllers\MainController@product')->name('product');
+Route::get('/product/{category}/{code?}', 'App\Http\Controllers\MainController@product')->name('product');
 
 
 

@@ -15,14 +15,20 @@
         <div class="caption">
             <h3>{{ $product->name }}</h3>
             <p>{{ $product->price }} ₽</p>
-            <p>
-                <form action="{{ route('basket-add', $product) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-primary" role="button">В корзину</button>
-                    <a href="{{ route('product', [$category ?? $product->category, $product]) }}" class="btn btn-default"
-                        role="button">Подробнее</a>
-                </form>
-            </p>
+            <div class="d-flex mb-5 ml-5">
+                @if ($product->isAvailable())
+                    <form action="{{ route('basket-add', $product) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-primary" role="button">В корзину</button>
+                    </form>
+                @else
+                <div class="mt-1">
+                    Нет в наличии
+                </div>
+                @endif
+                <a href="{{ route('product', [$category ?? $product->category, $product]) }}" class="btn btn-default ml-2"
+                    role="button">Подробнее</a>
+            </div>
         </div>
     </div>
 </div>

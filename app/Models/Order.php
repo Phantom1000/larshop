@@ -25,7 +25,7 @@ class Order extends Model
     public function calculateFullSum()
     {
         $sum = 0;
-        foreach ($this->products as $product) {
+        foreach ($this->products()->withTrashed()->get() as $product) {
             $sum += $product->getPriceForCount();
         }
         return $sum;
@@ -50,5 +50,27 @@ class Order extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 1);
+    }
+
+    public function saveOrder($name, $phone)
+    {
+        /*$this->name = $name;
+        $this->phone = $phone;
+        $this->status = 1;
+        $this->sum = $this->getFullSum();
+        $this->save();*/
+
+        /*$skus = $this->skus;
+        $this->save();
+
+        foreach ($skus as $skuInOrder) {
+            $this->skus()->attach($skuInOrder, [
+                'count' => $skuInOrder->countInOrder,
+                'price' => $skuInOrder->price,
+            ]);
+        }
+
+        session()->forget('order');
+        return true;*/
     }
 }

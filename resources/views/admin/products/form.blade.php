@@ -23,6 +23,13 @@
         @include('includes.input', ['type' => 'number', 'name' => 'price', 'field' => 'price', 'object' => $product])
     </div>
 </div>
+
+<div class="form-group row">
+    <label for="count" class="col-md-2">Количество</label>
+    <div class="col-md-4">
+        @include('includes.input', ['type' => 'number', 'name' => 'count', 'field' => 'count', 'object' => $product])
+    </div>
+</div>
 <div class="form-group row">
     <label for="category" class="col-md-2">Категория</label>
     <div class="col-md-4">

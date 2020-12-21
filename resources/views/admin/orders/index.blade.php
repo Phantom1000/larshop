@@ -26,11 +26,11 @@
                                 <td>{{ $order->name ?? '' }}</td>
                                 <td>{{ $order->phone ?? '' }}</td>
                                 <td>{{ $order->created_at->format('H:i d.m.Y') ?? '' }}</td>
-                                <td>{{ $order->getFullSum() }}</td>
+                                <td>{{ $order->calculateFullSum() }}</td>
                                 <td class="btn-group" role="group">
                                 <a @admin href="{{ route('orders.show', $order) }}" @else
                                         href="{{ route('person.orders.show', $order) }}" @endadmin class="btn btn-success"
-                                        type="button">Действия</a>
+                                        type="button">Просмотр</a>
                                 </td>
                             </tr>
                         @empty

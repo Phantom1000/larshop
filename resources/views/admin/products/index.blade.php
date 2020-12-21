@@ -16,8 +16,8 @@
                             <th>Код</th>
                             <th>Описание</th>
                             <th>Цена</th>
+                            <th>Количество</th>
                             <th>Категория</th>
-                            <th>Когда создана</th>
                             <th class="text-center">Действия</th>
                         </tr>
                     </thead>
@@ -29,8 +29,8 @@
                                 <td>{{ $product->code ?? '' }}</td>
                                 <td>{{ $product->description ?? '' }}</td>
                                 <td>{{ $product->price ?? '' }}</td>
+                                <td>{{ $product->count ?? '' }}</td>
                                 <td>{{ $product->category->name }}</td>
-                                <td>{{ $product->created_at ?? '' }}</td>
                                 <td class="btn-group" role="group">
                                     <a class="btn btn-info mr-2" href="{{ route('products.show', $product) }}">Открыть</a>
                                     <a class="btn btn-success mr-2" href="{{ route('products.edit', $product) }}">Изменить</a>

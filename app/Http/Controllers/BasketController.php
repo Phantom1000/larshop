@@ -4,96 +4,75 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\BasketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class BasketController extends Controller
 {
+    private $basketService;
+
+    public function __construct(BasketService $basketService)
+    {
+        $this->basketService = $basketService;
+    }
 
     public function basket()
     {
-        $orderId = session('orderId');
-        $order = Order::findOrFail($orderId);
+        $this->basketService->setOrder();
+        $order = $this->basketService->getOrder();
         return view('basket', compact('order'));
     }
 
     public function basketPlace()
     {
-        $orderId = session('orderId');
-        $order = Order::findOrFail($orderId);
+        $this->basketService->setOrder();
+        $order = $this->basketService->getOrder();
+        if (!$this->basketService->countAvailable()) {
+            session()->flash('danger', "Товар недоступен для заказа в полном объеме");
+            return redirect()->route('basket');
+        }
         return view('order', compact('order'));
     }
 
     public function basketAdd(Product $product)
     {
-        $orderId = session('orderId');
-        if (is_null($orderId)) {
-            $order = Order::create();
-            session(['orderId' => $order->id]);
+        $this->basketService->setOrder(true);
+        $result = $this->basketService->addProduct($product, true);
+
+        if ($result) {
+            session()->flash('success', "Добавлен товар $product->name");
         } else {
-            $order = Order::findOrFail($orderId);
+            session()->flash('danger', "Товар $product->name в большем 
+                количестве недоступен для заказа");
         }
 
-        if ($order->products->contains($product)) {
-            $orderProduct = $order->products()->where('product_id', $product->id)->first();
-            $orderProduct->pivot->increment('count');
-        } else {
-            $order->products()->attach($product);
-        }
-
-        if (Auth::check() && !isset($order->user_id)) {
-            $order->user()->associate(Auth::user());
-            $order->save();
-        }
-
-        Order::changeFullSum($product->price);
-
-        //session()->flash('success', 'Добавлен товар ' . $product->name);
-
-        return redirect()->route('basket')->withSuccess('Добавлен товар ' . $product->name);
+        return redirect()->route('basket');
     }
 
     public function basketRemove(Product $product)
     {
-        $orderId = session('orderId');
-        $order = Order::findOrFail($orderId);
-
-        if ($order->products->contains($product)) {
-            $orderProduct = $order->products()->where('product_id', $product->id)->first();
-            if ($orderProduct->pivot->count < 2) {
-                $order->products()->detach($product);
-            } else {
-                $orderProduct->pivot->decrement('count');
-            }
-        }
+        $this->basketService->setOrder();
+        $this->basketService->removeProduct($product);
 
         Order::changeFullSum(-$product->price);
 
-        session()->flash('danger', 'Удален товар ' . $product->name);
+        session()->flash('danger', "Удален товар $product->name");
 
         return redirect()->route('basket');
     }
 
     protected function basketConfirm(Request $request)
     {
-        $orderId = session('orderId');
-        $order = Order::findOrFail($orderId);
-        if ($order->status == 0) {
-            $order->update([
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'status' => 1
-            ]);
-            session()->forget('orderId');
+        $email = Auth::check() ? $request->user()->email : $request->email;
+        $this->basketService->setOrder();
+        if ($this->basketService->updateOrder($request->name, $request->phone, $email)) {
+            Order::eraseOrderSum();
             session()->flash('success', 'Ваш заказ принят в обработку');
-            if (Auth::check() && !isset($order->user_id)) {
-                $order->user()->associate(Auth::user());
-                $order->save();
-            }
         } else {
-            session()->flash('danger', 'Ошибка обработки заказа');
+            session()->flash('danger', "Товар недоступен для заказа в полном объеме");
+            return redirect()->route('basket');
         }
-        Order::eraseOrderSum();
 
         return redirect()->route('index');
     }

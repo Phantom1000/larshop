@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use function Psy\debug;
 use App\Models\Category;
+use App\Models\Subscription;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\FilterRequest;
 
-use function Psy\debug;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
@@ -48,8 +51,29 @@ class MainController extends Controller
         return view('category', compact('category'));
     }
 
-    public function product(Category $category, Product $product)
+    public function product(Category $category, $code)
     {
-        return view('product', compact('product'));
+        $product = Product::withTrashed()->where('code', $code)->first();
+        if ($product)
+            return view('product', compact('product'));
+        abort(404);
+    }
+
+    public function subscribe(Request $request, Product $product)
+    {
+        if ($request->filled('email')) {
+            $request->validate([
+                'email' => 'email'
+            ]);
+            $email = $request->email;
+        } else {
+            if (Auth::check()) {
+                $email = $request->user()->email;
+            } else {
+                return back()->withErrors(['email' => 'Введите email']);
+            }
+        }
+        $product->subscriptions()->create(compact('email'));
+        return back()->withSuccess('Спасибо, мы сообщим вам о поступлении товара');
     }
 }

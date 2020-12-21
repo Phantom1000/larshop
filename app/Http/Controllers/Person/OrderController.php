@@ -11,7 +11,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Auth::user()->orders()->active()->get();
+        $orders = Auth::user()->orders()->active()->paginate(5);
         return view('admin.orders.index', compact('orders'));
     }
 
@@ -20,6 +20,7 @@ class OrderController extends Controller
         if (!Auth::user()->orders->contains($order)) {
             return back();
         }
-        return view('admin.orders.show', compact('order'));
+        $products = $order->products()->withTrashed()->get();
+        return view('admin.orders.show', compact('order', 'products'));
     }
 }
